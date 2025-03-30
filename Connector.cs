@@ -33,12 +33,13 @@ namespace Academy
         {
             FreeConsole();
         }
-        public DataTable Select(string colums, string tables, string condition="")
+        public DataTable Select(string colums, string tables, string condition="", string group_by = "")
         {
 
             DataTable table = null;
             string cmd = $"SELECT {colums} FROM {tables}";
             if (condition != "") cmd += $" WHERE {condition}";
+            if (group_by != "") cmd += $" GROUP BY {group_by}";
             cmd += ";";
             SqlCommand command = new SqlCommand(cmd, connection);
             connection.Open();
@@ -122,6 +123,25 @@ namespace Academy
             }
             reader.Close();
             connection.Close();
+        }
+
+        public Dictionary<string, int> GetDictionary(string colums, string tables)
+        {
+            Dictionary<string, int> values = new Dictionary<string, int>();
+            string cmd = $"SELECT {colums} FROM {tables}";   
+            SqlCommand command = new SqlCommand (cmd, connection);
+            connection.Open();
+            SqlDataReader reader = command.ExecuteReader ();
+            if(reader.HasRows)
+            {
+                while(reader.Read())
+                {
+                    values[reader[1].ToString()] = Convert.ToInt32(reader[0]);
+                }
+            }
+            reader.Close();
+            connection.Close();
+            return values;
         }
     }
    
