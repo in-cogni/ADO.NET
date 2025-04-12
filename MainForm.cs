@@ -24,26 +24,34 @@ namespace Academy_DataSet
             InitializeComponent();
             AllocConsole();
 
-            GroupsRelatedData = new Cache();
+            UpdateTimer();//самый первый вывод
 
-            GroupsRelatedData.AddTable("Directions", "direction_id,direction_name");
-            GroupsRelatedData.AddTable("Groups", "group_id,group_name,direction");
-            GroupsRelatedData.AddRelation("GroupsDirections", "Groups,direction","Directions,direction_id");
-            GroupsRelatedData.Load();
-            GroupsRelatedData.Print("Directions");
-            GroupsRelatedData.Print("Groups");
+            timer1.Interval = 10000;//обновление раз в 10 секунд
+            timer1.Tick += timer1_Tick;
+            timer1.Start();
 
-            //загружаем направления из базы в combobox:
-            //1) Направления обучения уже загружены в таблицу в DataSet, и эту таблицу мы указываем как источник данных:
-            cbDirections.DataSource = GroupsRelatedData.Set.Tables["Directions"];
-            //2) Из множества полец таблицы нужно указать, какое поле будет отображаться в выпадающем списке,
-            cbDirections.DisplayMember = "direction_name";
-            //3) И какое поле будет возвращаться при выборе элемента ComboBox
-            cbDirections.ValueMember ="direction_id";
+            //перенесла следующий код в метод  UpdateTimer()
 
-            cbGroups.DataSource = GroupsRelatedData.Set.Tables["Groups"];
-            cbGroups.DisplayMember = "group_name";
-            cbGroups.ValueMember = "group_id";
+            //GroupsRelatedData = new Cache();
+
+            //GroupsRelatedData.AddTable("Directions", "direction_id,direction_name");
+            //GroupsRelatedData.AddTable("Groups", "group_id,group_name,direction");
+            //GroupsRelatedData.AddRelation("GroupsDirections", "Groups,direction","Directions,direction_id");
+            //GroupsRelatedData.Load();
+            //GroupsRelatedData.Print("Directions");
+            //GroupsRelatedData.Print("Groups");
+
+            ////загружаем направления из базы в combobox:
+            ////1) Направления обучения уже загружены в таблицу в DataSet, и эту таблицу мы указываем как источник данных:
+            //cbDirections.DataSource = GroupsRelatedData.Set.Tables["Directions"];
+            ////2) Из множества полец таблицы нужно указать, какое поле будет отображаться в выпадающем списке,
+            //cbDirections.DisplayMember = "direction_name";
+            ////3) И какое поле будет возвращаться при выборе элемента ComboBox
+            //cbDirections.ValueMember ="direction_id";
+
+            //cbGroups.DataSource = GroupsRelatedData.Set.Tables["Groups"];
+            //cbGroups.DisplayMember = "group_name";
+            //cbGroups.ValueMember = "group_id";
         }
         private void cbDirections_SelectedIndexChanged(object sender, EventArgs e)
         {
@@ -90,6 +98,39 @@ namespace Academy_DataSet
         public static extern bool AllocConsole();
         [DllImport("kernel32.dll")]
         public static extern bool FreeConsole();
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            UpdateTimer();
+        }
+        void UpdateTimer()
+        {
+            GroupsRelatedData = new Cache();
+
+            GroupsRelatedData.AddTable("Directions", "direction_id,direction_name");
+            GroupsRelatedData.AddTable("Groups", "group_id,group_name,direction");
+            GroupsRelatedData.AddRelation("GroupsDirections", "Groups,direction", "Directions,direction_id");
+            GroupsRelatedData.Load();
+            GroupsRelatedData.Print("Directions");
+            GroupsRelatedData.Print("Groups");
+
+            //загружаем направления из базы в combobox:
+            //1) Направления обучения уже загружены в таблицу в DataSet, и эту таблицу мы указываем как источник данных:
+            cbDirections.DataSource = GroupsRelatedData.Set.Tables["Directions"];
+            //2) Из множества полец таблицы нужно указать, какое поле будет отображаться в выпадающем списке,
+            cbDirections.DisplayMember = "direction_name";
+            //3) И какое поле будет возвращаться при выборе элемента ComboBox
+            cbDirections.ValueMember = "direction_id";
+
+            cbGroups.DataSource = GroupsRelatedData.Set.Tables["Groups"];
+            cbGroups.DisplayMember = "group_name";
+            cbGroups.ValueMember = "group_id";
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            UpdateTimer();
+        }
     }
 }
 
