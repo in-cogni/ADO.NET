@@ -15,72 +15,73 @@ using System.Windows.Forms;
 
 namespace Academy
 {
-    class Connector
-    {
-        readonly string CONNECTION_STRING;// = ConfigurationManager.ConnectionStrings["PV_319_Import"].ConnectionString;
-        SqlConnection connection;
+	class Connector
+	{
+		readonly string CONNECTION_STRING;// = ConfigurationManager.ConnectionStrings["PV_319_Import"].ConnectionString;
+		SqlConnection connection;
         private ToolStripStatusLabel toolStripStatusLabel1;
         public Connector(string connection_string, ToolStripStatusLabel toolStripStatusLabel1)
-        {
-            //CONNECTION_STRING = ConfigurationManager.ConnectionStrings["PV_319_Import"].ConnectionString;
-            CONNECTION_STRING = connection_string;
-            connection = new SqlConnection(CONNECTION_STRING);
-            AllocConsole();
-            Console.WriteLine(CONNECTION_STRING);
+		{
+			//CONNECTION_STRING = ConfigurationManager.ConnectionStrings["PV_319_Import"].ConnectionString;
+			CONNECTION_STRING = connection_string;
+			connection = new SqlConnection(CONNECTION_STRING);
+			AllocConsole();
+			Console.WriteLine(CONNECTION_STRING);
             this.toolStripStatusLabel1 = toolStripStatusLabel1;
-        }
-        ~Connector()
-        {
-            FreeConsole();
-        }
+		}
+		~Connector()
+		{
+			FreeConsole();
+		}
         public DataTable Select(string colums, string tables, string condition="", string group_by = "")
-        {
+		{
+			DataTable table = null;
 
-            DataTable table = null;
+            //DataTable table = null;
             string cmd = $"SELECT {colums} FROM {tables}";
-            if (condition != "") cmd += $" WHERE {condition}";
+			if (condition != "") cmd += $" WHERE {condition}";
             if (group_by != "") cmd += $" GROUP BY {group_by}";
-            cmd += ";";
-            SqlCommand command = new SqlCommand(cmd, connection);
-            connection.Open();
-            SqlDataReader reader = command.ExecuteReader();
+			cmd += ";";
+			SqlCommand command = new SqlCommand(cmd, connection);
+			connection.Open();
+			SqlDataReader reader = command.ExecuteReader();
 
             if(reader.HasRows)
-            {
+			{
 
                 //1) создаем таблицу: 
-                table = new DataTable();
-                table.Load(reader);
+				table = new DataTable();
+				table.Load(reader);
 #if OLD
 
                 //2) добавляем в нее поля:
                 for (int i=0; i<reader.FieldCount; i++)
-                {
-                    table.Columns.Add();
-                }
+				{
+					table.Columns.Add();
+				}
 
                 //3) заполняем таблицу:
                 while(reader.Read())
-                {
-                    DataRow row = table.NewRow();
+				{
+					DataRow row = table.NewRow();
                     for(int i=0; i<reader.FieldCount;i++)
-                    {
-                        row[i] = reader[i];
-                    }
-                    table.Rows.Add(row);
-                }
+					{
+						row[i] = reader[i];
+					}
+					table.Rows.Add(row);
+				}
 #endif
-            }
+			}
 
-            reader.Close();
-            connection.Close();
+			reader.Close();
+			connection.Close();
 
-            return table;
-        }
-        [DllImport("kernel32.dll")]
-        public static extern bool AllocConsole();
-        [DllImport("kernel32.dll")]
-        public static extern bool FreeConsole();
+			return table; 
+		}
+		[DllImport("kernel32.dll")]
+		public static extern bool AllocConsole();
+		[DllImport("kernel32.dll")]
+		public static extern bool FreeConsole();
         public void StatusStrip()
         {
             try
@@ -96,7 +97,7 @@ namespace Academy
                 // Обновляем статус-строку
                 toolStripStatusLabel1.Text = $"Студенты: {studentCount}, Группы: {groupCount}, Направления: {directionCount}, Дисциплины: {disciplineCount}, Преподаватели: {teacherCount}";
                 connection.Close();
-            }
+	}
             catch (Exception ex)
             {
                 MessageBox.Show("Ошибка: \n" + ex.Message);
@@ -125,10 +126,11 @@ namespace Academy
             connection.Close();
         }
 
-        public Dictionary<string, int> GetDictionary(string colums, string tables)
+        public Dictionary<string, int> GetDictionary(string colums, string tables,string condition="")
         {
             Dictionary<string, int> values = new Dictionary<string, int>();
-            string cmd = $"SELECT {colums} FROM {tables}";   
+            string cmd = $"SELECT {colums} FROM {tables}";
+            if (condition != "") cmd += $" WHERE {condition}";
             SqlCommand command = new SqlCommand (cmd, connection);
             connection.Open();
             SqlDataReader reader = command.ExecuteReader ();
@@ -143,6 +145,8 @@ namespace Academy
             connection.Close();
             return values;
         }
+
+
     }
    
 }
